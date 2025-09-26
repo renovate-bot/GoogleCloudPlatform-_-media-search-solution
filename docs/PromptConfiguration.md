@@ -66,8 +66,8 @@ For each content type defined in the `types` array, you must create a correspond
 system_instructions = """
 Your role is a film, and media trailer official capable of describing
 in detail directors, producers, cinematographers, screenwriters, and actors.
-In addition, you're able to summarize plot points, identify segment time stamps
-and recognize which actor is playing which character, and which character is in each segment.
+In addition, you're able to summarize plot points, identify scene time stamps
+and recognize which actor is playing which character, and which character is in each scene.
 """
 
 summary = """Review the attached media file and extract the following information
@@ -82,23 +82,23 @@ summary = """Review the attached media file and extract the following informatio
 - Genre as genre
 - Rating as rating with one of the following values: G, PG, PG-13, R, NC-17
 - Cast as cast, an array of Cast Members including Character Name as character_name, and associated actor name as actor_name
-- Extract the segments based on their narrative and visual coherence, ordering them by start and end times. The primary goal is to create segments that feel natural and complete.
-    - A segment consists of continuous action or dialogue in a single location. A segment break MUST occur at a logical transition point, such as:
+- Extract the scenes based on their narrative and visual coherence, ordering them by start and end times. The primary goal is to create segments that feel natural and complete.
+    - A scene is a continuous segment of action or dialogue in a single location. A scene break MUST occur at a logical transition point, such as:
         - A change in location.
         - A significant jump forward or backward in time.
         - The start/end of a major conversation or action sequence.
-    - Crucially, DO NOT end a segment abruptly. Avoid cutting in the middle of a continuous camera shot (a single take) or in the middle of a spoken sentence.
-    While segments must have a minimum length of 10 seconds, their duration should be determined by the content. Prioritize logical, coherent segmentation over adhering to any specific length.
-    - The sequence of segments must be continuous and cover the entire video from start to finish without any gaps. The total length of the video is {{ .VIDEO_LENGTH }} seconds.
-    - The first segment must start at 00:00:00.
-    - The end of one segment must be the exact start of the next segment.
-    - The end time of the final segment must be the total duration of the video.
-    - Add a sequence number to each segment starting from 1 and incrementing in order of the timestamp.
+    - Crucially, DO NOT end a scene abruptly. Avoid cutting in the middle of a continuous camera shot (a single take) or in the middle of a spoken sentence.
+    While scenes must have a minimum length of 10 seconds, their duration should be determined by the content. Prioritize logical, coherent segmentation over adhering to any specific length.
+    - The segmented scenes must be continuous and cover the entire video from start to finish without any gaps. The total length of the video is {{ .VIDEO_LENGTH }} seconds.
+    - The first scene must start at 00:00:00.
+    - The end of one scene must be the exact start of the next scene.
+    - The end time of the final scene must be the total duration of the video.
+    - Add a sequence number to each scene starting from 1 and incrementing in order of the timestamp.
 
 **Timestamp Formatting and Logic Rules:**
 - All `start` and `end` timestamps must be strings formatted as "HH:MM:SS", with each component zero-padded to two digits. Values must be calculated correctly; for example, a moment 119 seconds into a video is "00:01:59", not "01:19:00".
 - All timestamps must be logical and fall within the video's total duration. A video that is 1 minute and 59 seconds long cannot have a timestamp of "00:02:00" or greater.
-- For any given segment, the `end` timestamp must always be chronologically after its `start` timestamp.
+- For any given scene, the `end` timestamp must always be chronologically after its `start` timestamp.
 
 Example Output Format:
 {{ .EXAMPLE_JSON }}
@@ -110,10 +110,10 @@ The given time segement timestamps are in the format of HH:MM:SS or hours:minute
 - sequence_number: {{ .SEQUENCE }} as a number
 - start: {{ .TIME_START }} as a string
 - end: {{ .TIME_END }} as a string
-- script: write a detailed segment description that includes colors, action sequences, dialogue with both character and actor citations, any products or brand names, and lastly any significant props, in plain text.
+- script: write a detailed scene description that includes colors, action sequences, dialogue with both character and actor citations, any products or brand names, and lastly any significant props, in plain text.
 
 **IMPORTANT FALLBACK INSTRUCTION:**
-If you are unable to generate a detailed segment description from the video segment (for example, if the segment is too short, lacks distinct action, or has no dialogue), you MUST provide a default segment extraction. For this default segment, use the provided 'Media Summary' as the content for the 'script' field. The 'start' and 'end' times should still match the provided time frame {{ .TIME_START }} - {{ .TIME_END }}.
+If you are unable to generate a detailed scene description from the video segment (for example, if the segment is too short, lacks distinct action, or has no dialogue), you MUST provide a default scene extraction. For this default scene, use the provided 'Media Summary' as the content for the 'script' field. The 'start' and 'end' times should still match the provided time frame {{ .TIME_START }} - {{ .TIME_END }}.
 
 Media Summary:
 {{ .SUMMARY_DOCUMENT }}
